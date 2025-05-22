@@ -4,7 +4,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import 'package:user_rest_api/service/user_service.dart';
+import 'package:user_rest_api/services/user_service.dart';
 import 'package:user_rest_api/api/user_api.dart';
 
 // 配置CORS中间件

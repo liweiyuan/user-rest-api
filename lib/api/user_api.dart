@@ -3,7 +3,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import '../models/user.dart';
-import '../service/user_service.dart';
+import '../services/user_service.dart';
 
 class UserApi {
   final UserService _userService;
