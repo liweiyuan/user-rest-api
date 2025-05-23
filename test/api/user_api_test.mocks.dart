@@ -3,9 +3,12 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:async' as _i5;
+
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:user_rest_api/models/user.dart' as _i2;
-import 'package:user_rest_api/services/user_service.dart' as _i3;
+import 'package:user_rest_api/dao/user_dao.dart' as _i2;
+import 'package:user_rest_api/models/user.dart' as _i3;
+import 'package:user_rest_api/services/user_service.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -21,49 +24,71 @@ import 'package:user_rest_api/services/user_service.dart' as _i3;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeUser_0 extends _i1.SmartFake implements _i2.User {
-  _FakeUser_0(Object parent, Invocation parentInvocation)
+class _FakeUserDao_0 extends _i1.SmartFake implements _i2.UserDao {
+  _FakeUserDao_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeUser_1 extends _i1.SmartFake implements _i3.User {
+  _FakeUser_1(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
 /// A class which mocks [UserService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserService extends _i1.Mock implements _i3.UserService {
+class MockUserService extends _i1.Mock implements _i4.UserService {
   MockUserService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i2.User> getAllUsers() =>
+  _i2.UserDao get userDao =>
+      (super.noSuchMethod(
+            Invocation.getter(#userDao),
+            returnValue: _FakeUserDao_0(this, Invocation.getter(#userDao)),
+          )
+          as _i2.UserDao);
+
+  @override
+  _i5.Future<List<_i3.User>> getAllUsers() =>
       (super.noSuchMethod(
             Invocation.method(#getAllUsers, []),
-            returnValue: <_i2.User>[],
+            returnValue: _i5.Future<List<_i3.User>>.value(<_i3.User>[]),
           )
-          as List<_i2.User>);
+          as _i5.Future<List<_i3.User>>);
 
   @override
-  _i2.User? getUserById(int? id) =>
-      (super.noSuchMethod(Invocation.method(#getUserById, [id])) as _i2.User?);
+  _i5.Future<_i3.User?> getUserById(int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserById, [id]),
+            returnValue: _i5.Future<_i3.User?>.value(),
+          )
+          as _i5.Future<_i3.User?>);
 
   @override
-  _i2.User addUser(_i2.User? user) =>
+  _i5.Future<_i3.User> addUser(_i3.User? user) =>
       (super.noSuchMethod(
             Invocation.method(#addUser, [user]),
-            returnValue: _FakeUser_0(this, Invocation.method(#addUser, [user])),
+            returnValue: _i5.Future<_i3.User>.value(
+              _FakeUser_1(this, Invocation.method(#addUser, [user])),
+            ),
           )
-          as _i2.User);
+          as _i5.Future<_i3.User>);
 
   @override
-  _i2.User? updateUser(int? id, _i2.User? updatedUser) =>
-      (super.noSuchMethod(Invocation.method(#updateUser, [id, updatedUser]))
-          as _i2.User?);
+  _i5.Future<_i3.User?> updateUser(int? id, _i3.User? updatedUser) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateUser, [id, updatedUser]),
+            returnValue: _i5.Future<_i3.User?>.value(),
+          )
+          as _i5.Future<_i3.User?>);
 
   @override
-  bool deleteUser(int? id) =>
+  _i5.Future<bool> deleteUser(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteUser, [id]),
-            returnValue: false,
+            returnValue: _i5.Future<bool>.value(false),
           )
-          as bool);
+          as _i5.Future<bool>);
 }

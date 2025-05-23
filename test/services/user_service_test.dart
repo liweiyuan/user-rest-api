@@ -1,102 +1,104 @@
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:user_rest_api/models/user.dart';
 import 'package:user_rest_api/services/user_service.dart';
+import 'package:user_rest_api/dao/user_dao.dart';
+
+@GenerateMocks([UserDao])
+import 'user_service_test.mocks.dart';
 
 void main() {
-  group('UserService', () {
-    late UserService userService;
+  late UserService userService;
+  late MockUserDao mockUserDao;
 
-    setUp(() {
-      userService = UserService();
+  setUp(() {
+    mockUserDao = MockUserDao();
+    userService = UserService(userDao: mockUserDao);
+  });
+
+  group('UserService', () {
+    test('获取所有用户测试', () async {
+      // 设置mock行为
+      when(mockUserDao.getAllUsers()).thenAnswer(
+        (_) async => [
+          User(id: 1, name: 'John Doe', age: 30),
+          User(id: 2, name: 'Jane Smith', age: 25),
+          User(id: 3, name: 'Bob Johnson', age: 35),
+        ],
+      );
+
+      final users = await userService.getAllUsers();
+      expect(users.length, 3);
+      expect(users[0].name, 'John Doe');
+      expect(users[1].name, 'Jane Smith');
+      expect(users[2].name, 'Bob Johnson');
+
+      verify(mockUserDao.getAllUsers()).called(1);
     });
 
-    group('UserService', () {
-      test("Test Mock data", () {
-        final users = userService.getAllUsers();
-        expect(users.length, 3);
-        expect(users[0].name, 'John Doe');
-        expect(users[1].name, 'Jane Smith');
-        expect(users[2].name, 'Bob Johnson');
-      });
+    test('添加新用户测试', () async {
+      final newUser = User(id: 0, name: 'Test User', age: 40);
+      final expectedUser = User(id: 1, name: 'Test User', age: 40);
 
-      test('应能添加新用户', () {
-        final newUser = User(
-          id: 0,
-          name: 'Test User',
-          email: 'test@example.com',
-          age: 40,
-        );
-        final addedUser = userService.addUser(newUser);
+      when(
+        mockUserDao.createUser(newUser),
+      ).thenAnswer((_) async => expectedUser);
 
-        expect(addedUser.id, isNot(0));
-        expect(addedUser.name, 'Test User');
+      final addedUser = await userService.addUser(newUser);
+      expect(addedUser.id, 1);
+      expect(addedUser.name, 'Test User');
 
-        final retrievedUser = userService.getUserById(addedUser.id);
-        expect(retrievedUser, isNotNull);
-        expect(retrievedUser?.name, 'Test User');
-      });
+      verify(mockUserDao.createUser(newUser)).called(1);
+    });
 
-      test('应能更新现有用户', () {
-        // 首先添加一个用户
-        final newUser = User(
-          id: 0,
-          name: 'Original Name',
-          email: 'original@example.com',
-          age: 25,
-        );
-        final addedUser = userService.addUser(newUser);
+    test('更新现有用户测试', () async {
+      final updatedData = User(id: 1, name: 'Updated Name', age: 26);
 
-        // 然后更新该用户
-        final updatedData = User(
-          id: addedUser.id,
-          name: 'Updated Name',
-          email: 'updated@example.com',
-          age: 26,
-        );
+      when(
+        mockUserDao.updateUser(1, updatedData),
+      ).thenAnswer((_) async => true);
+      when(mockUserDao.getUserById(1)).thenAnswer((_) async => updatedData);
 
-        final updatedUser = userService.updateUser(addedUser.id, updatedData);
+      final updatedUser = await userService.updateUser(1, updatedData);
 
-        expect(updatedUser, isNotNull);
-        expect(updatedUser?.name, 'Updated Name');
-        expect(updatedUser?.email, 'updated@example.com');
-        expect(updatedUser?.age, 26);
-      });
-      test('更新不存在的用户时应返回null', () {
-        final nonExistentUser = User(
-          id: 999,
-          name: 'Nobody',
-          email: 'nobody@example.com',
-          age: 0,
-        );
-        final result = userService.updateUser(999, nonExistentUser);
-        expect(result, isNull);
-      });
+      expect(updatedUser, isNotNull);
+      expect(updatedUser!.name, 'Updated Name');
+      expect(updatedUser.age, 26);
 
-      test('应能删除用户', () {
-        // 首先添加一个用户
-        final newUser = User(
-          id: 0,
-          name: 'To Delete',
-          email: 'delete@example.com',
-          age: 30,
-        );
-        final addedUser = userService.addUser(newUser);
+      verify(mockUserDao.updateUser(1, updatedData)).called(1);
+      verify(mockUserDao.getUserById(1)).called(1);
+    });
 
-        // 确认用户存在
-        expect(userService.getUserById(addedUser.id), isNotNull);
+    test('更新不存在用户测试', () async {
+      final nonExistentUser = User(id: 999, name: 'Nobody', age: 0);
 
-        // 删除用户
-        final result = userService.deleteUser(addedUser.id);
-        expect(result, isTrue);
+      when(
+        mockUserDao.updateUser(999, nonExistentUser),
+      ).thenAnswer((_) async => false);
 
-        // 确认用户已删除
-        expect(userService.getUserById(addedUser.id), isNull);
-      });
+      final result = await userService.updateUser(999, nonExistentUser);
+      expect(result, isNull);
 
-      test('删除不存在的用户时应返回false', () {
-        final result = userService.deleteUser(999);
-        expect(result, isFalse);
-      });
+      verify(mockUserDao.updateUser(999, nonExistentUser)).called(1);
+    });
+
+    test('删除用户测试', () async {
+      when(mockUserDao.deleteUser(1)).thenAnswer((_) async => true);
+
+      final result = await userService.deleteUser(1);
+      expect(result, isTrue);
+
+      verify(mockUserDao.deleteUser(1)).called(1);
+    });
+
+    test('删除不存在用户测试', () async {
+      when(mockUserDao.deleteUser(999)).thenAnswer((_) async => false);
+
+      final result = await userService.deleteUser(999);
+      expect(result, isFalse);
+
+      verify(mockUserDao.deleteUser(999)).called(1);
     });
   });
 }

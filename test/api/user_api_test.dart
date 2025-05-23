@@ -23,12 +23,12 @@ void main() {
     test('GET /users 应返回所有用户', () async {
       // 准备mock数据
       final users = [
-        User(id: 1, name: 'User 1', email: 'user1@example.com', age: 30),
-        User(id: 2, name: 'User 2', email: 'user2@example.com', age: 25),
+        User(id: 1, name: 'User 1', age: 30),
+        User(id: 2, name: 'User 2', age: 25),
       ];
 
       // 设置mock行为
-      when(mockUserService.getAllUsers()).thenReturn(users);
+      when(mockUserService.getAllUsers()).thenAnswer((_) async => users);
 
       // 发送请求到API
       final request = Request('GET', Uri.parse('http://localhost/users'));
@@ -50,15 +50,10 @@ void main() {
 
     test('GET /users/:id 应返回单个用户', () async {
       // 准备mock数据
-      final user = User(
-        id: 1,
-        name: 'Test User',
-        email: 'test@example.com',
-        age: 35,
-      );
+      final user = User(id: 1, name: 'Test User', age: 35);
 
       // 设置mock行为
-      when(mockUserService.getUserById(1)).thenReturn(user);
+      when(mockUserService.getUserById(1)).thenAnswer((_) async => user);
 
       // 发送请求到API
       final request = Request('GET', Uri.parse('http://localhost/users/1'));
@@ -79,7 +74,7 @@ void main() {
 
     test('GET /users/:id 对于不存在的用户应返回404', () async {
       // 设置mock行为 - 返回null表示用户不存在
-      when(mockUserService.getUserById(999)).thenReturn(null);
+      when(mockUserService.getUserById(999)).thenAnswer((_) async => null);
 
       // 发送请求到API
       final request = Request('GET', Uri.parse('http://localhost/users/999'));

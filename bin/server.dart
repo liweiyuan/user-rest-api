@@ -3,6 +3,7 @@ import 'package:args/args.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:user_rest_api/db/db.dart';
 
 import 'package:user_rest_api/services/user_service.dart';
 import 'package:user_rest_api/api/user_api.dart';
@@ -32,6 +33,8 @@ Middleware _corsMiddleware() {
 }
 
 void main(List<String> args) async {
+  await MySQLService.init(); // 初始化连接池
+
   // 解析命令行参数
   final parser = ArgParser()..addOption('port', abbr: 'p', defaultsTo: '8080');
 
